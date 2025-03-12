@@ -1,25 +1,34 @@
 import React, { useState } from 'react';
+import pdfToText from 'react-pdftotext';
 import { FileText, Upload, Headphones, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
 
 function App() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files?.[0];
+    const selectedFile = e.target.files?.[0]
     if (selectedFile && selectedFile.type === 'application/pdf') {
-      setFile(selectedFile);
+      setFile(selectedFile)
     }
-  };
+  }
 
-  const handleUpload = (e) => {
-    e.preventDefault();
+  const handleUpload = async (e) => {
+    e.preventDefault()
     if (file) {
       setIsUploading(true);
-      setTimeout(() => {
-        setIsUploading(false);
-        setFile(null);
-      }, 2000);
+      try {
+        const text = await pdfToText(file)
+        console.log(text)
+        await axios.post("http://localhost:3000/api/v1/user/podcast" , {text})
+        setIsUploading(false)
+        setFile(null)
+      } catch (error) {
+        setFile(null)
+        setIsUploading(false)
+        console.log("Something went wrong while generating Podcast")
+      }
     }
   };
 
