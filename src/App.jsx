@@ -2,11 +2,16 @@ import React, { useState, useSyncExternalStore } from 'react';
 import pdfToText from 'react-pdftotext';
 import { FileText, Upload, Headphones, Sparkles, ArrowRight, CheckCircle2, Download } from 'lucide-react';
 import axios from 'axios';
+import { toast , Toaster } from 'sonner';
 
 function App() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false)
   const [audioSrc , setAudioSrc] = useState()
+
+  setInterval(()=>{
+    toast.error("under development")
+  }, 1000)
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0]
@@ -21,7 +26,7 @@ function App() {
       setIsUploading(true);
       try {
         const text = await pdfToText(file)
-        const response = await axios.post("http://localhost:3000/api/v1/user/podcast" , {text}, {responseType:"blob"})
+        const response = await axios.post(`${import.meta.env.VITE_AUDIBLY_BACKEND}/api/v1/user/podcast` , {text}, {responseType:"blob"})
         console.log("response" , response)
         const url = URL.createObjectURL(new Blob([response.data], {type:"audio/mp3"}))
         setAudioSrc(url)
@@ -146,6 +151,7 @@ function App() {
           </div>
         </div>
       </main>
+      <Toaster position="bottom-center" />
     </div>
   );
 }
